@@ -5,9 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Portal aspirasi siswa SMKN 2 Kota Serang">
+  <meta name="theme-color" content="#0b1f3a">
   <title>Web Aspirasi OSIS | SMKN 2 Kota Serang</title>
   <style>
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -25,7 +27,7 @@
     header small { display: block; color: #d7deeb; }
     main {
       max-width: 850px;
-      margin: 45px auto;
+      margin: 35px auto;
       padding: 20px;
     }
     .hero {
@@ -41,11 +43,14 @@
       display: inline-block;
       padding: 12px 18px;
       margin: 8px 8px 0 0;
+      border: 0;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
       background: #c9a227;
       color: #0b1f3a;
+      cursor: pointer;
+      font-size: 15px;
     }
     .secondary {
       border: 1px solid white;
@@ -59,10 +64,53 @@
       margin-top: 20px;
       border: 1px solid #e0e5ed;
     }
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 14px 0 6px;
+    }
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd3df;
+      border-radius: 8px;
+      background: white;
+      color: #17243a;
+      font: inherit;
+    }
+    textarea { min-height: 140px; resize: vertical; }
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid #c9a227;
+      outline-offset: 1px;
+    }
+    .hint { color: #5b6678; font-size: 14px; }
+    .notice {
+      padding: 12px;
+      background: #fff8df;
+      border-left: 4px solid #c9a227;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .result {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+    }
+    .success { background: #e8f7ed; color: #155b30; }
+    .error { background: #fff0f0; color: #8b1c1c; }
+    .hidden { display: none; }
+    button:disabled { opacity: .6; cursor: wait; }
     footer {
       text-align: center;
       color: #5b6678;
       padding: 25px;
+    }
+    @media (max-width: 600px) {
+      main { margin: 18px auto; padding: 14px; }
+      .hero { padding: 25px 18px; }
+      .card { padding: 18px; }
     }
   </style>
 </head>
@@ -80,23 +128,207 @@
         Sampaikan saran, kritik, dan masukan untuk membantu
         menciptakan lingkungan sekolah yang lebih baik.
       </p>
-      <a class="button" href="#informasi">Jelajahi Layanan</a>
-      <a class="button secondary" href="#informasi">Pelajari Cara Kerja</a>
+      <a class="button" href="#form-aspirasi">Kirim Aspirasi</a>
+      <a class="button secondary" href="#lacak">Lacak Aspirasi</a>
     </section>
 
     <section class="card" id="informasi">
       <h2>Selamat Datang!</h2>
       <p>
-        Portal ini dirancang sebagai sarana aspirasi siswa.
-        Pada tahap awal, website masih dalam pengembangan dan
-        belum menerima aspirasi sungguhan.
+        Portal ini menjadi sarana untuk menyampaikan masukan
+        tentang fasilitas, pembelajaran, kebersihan, kegiatan,
+        dan hal lain yang berkaitan dengan lingkungan sekolah.
       </p>
-      <p><strong>Status:</strong> Tahap pengembangan</p>
+      <p class="notice">
+        Sampaikan aspirasi dengan sopan. Hindari menuliskan
+        kata sandi, nomor identitas, informasi kesehatan pribadi,
+        atau data sensitif orang lain.
+      </p>
+    </section>
+
+    <section class="card" id="form-aspirasi">
+      <h2>Kirim Aspirasi</h2>
+      <p class="hint">
+        Nama dan kelas opsional. Isi aspirasi minimal 5 dan
+        maksimal 3.000 karakter.
+      </p>
+
+      <form id="aspirationForm">
+        <label for="student_name">Nama (opsional)</label>
+        <input id="student_name" name="student_name" maxlength="100"
+          autocomplete="name">
+
+        <label for="student_class">Kelas (opsional)</label>
+        <input id="student_class" name="student_class" maxlength="30"
+          placeholder="Contoh: XI TPL 1">
+
+        <label for="category">Kategori *</label>
+        <select id="category" name="category" required>
+          <option value="">Pilih kategori</option>
+          <option>Fasilitas</option>
+          <option>Pembelajaran</option>
+          <option>Kebersihan</option>
+          <option>Kedisiplinan</option>
+          <option>Ekstrakurikuler</option>
+          <option>Kegiatan OSIS</option>
+          <option>Evaluasi OSIS</option>
+          <option>Lainnya</option>
+        </select>
+
+        <label for="message">Isi aspirasi *</label>
+        <textarea id="message" name="message" required
+          minlength="5" maxlength="3000"
+          placeholder="Tuliskan saran, kritik, atau masukan secara jelas..."></textarea>
+        <p class="hint"><span id="charCount">0</span>/3000 karakter</p>
+
+        <button class="button" id="submitButton" type="submit">
+          Kirim Aspirasi
+        </button>
+      </form>
+
+      <div id="submitResult" class="result hidden"
+        role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="card" id="lacak">
+      <h2>Lacak Aspirasi</h2>
+      <p>
+        Masukkan kode pelacakan yang kamu terima setelah
+        aspirasi berhasil dikirim.
+      </p>
+      <form id="trackingForm">
+        <label for="trackingCode">Kode pelacakan</label>
+        <input id="trackingCode" required maxlength="30"
+          placeholder="Contoh: ASP-XXXXXXXXXX">
+        <button class="button" type="submit">Lacak Status</button>
+      </form>
+      <div id="trackingResult" class="result hidden"
+        role="status" aria-live="polite"></div>
+      <p class="hint">
+        Fitur ini belum aktif. Endpoint pelacakan yang aman
+        perlu dibuat terlebih dahulu.
+      </p>
     </section>
   </main>
 
   <footer>
     &copy; 2026 Web Aspirasi OSIS SMKN 2 Kota Serang
   </footer>
+
+  <script>
+    const SUPABASE_URL =
+      "https://xmzmywxttqxeydhcxoqq.supabase.co";
+
+    const FUNCTION_URL =
+      SUPABASE_URL + "/functions/v1/kirim-aspirasi";
+
+    const categories = [
+      "Fasilitas",
+      "Pembelajaran",
+      "Kebersihan",
+      "Kedisiplinan",
+      "Ekstrakurikuler",
+      "Kegiatan OSIS",
+      "Evaluasi OSIS",
+      "Lainnya"
+    ];
+
+    const form = document.getElementById("aspirationForm");
+    const submitButton = document.getElementById("submitButton");
+    const submitResult = document.getElementById("submitResult");
+    const messageInput = document.getElementById("message");
+    const charCount = document.getElementById("charCount");
+
+    messageInput.addEventListener("input", () => {
+      charCount.textContent = messageInput.value.length;
+    });
+
+    function showResult(element, message, success) {
+      element.className =
+        "result " + (success ? "success" : "error");
+      element.textContent = message;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        student_name:
+          document.getElementById("student_name").value.trim(),
+        student_class:
+          document.getElementById("student_class").value.trim(),
+        category:
+          document.getElementById("category").value,
+        message: messageInput.value.trim()
+      };
+
+      if (!categories.includes(payload.category)) {
+        showResult(submitResult, "Silakan pilih kategori yang tersedia.", false);
+        return;
+      }
+
+      if (payload.message.length < 5 || payload.message.length > 3000) {
+        showResult(submitResult, "Isi aspirasi harus 5–3.000 karakter.", false);
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Mengirim...";
+      submitResult.className = "result hidden";
+
+      try {
+        const response = await fetch(FUNCTION_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.tracking_code) {
+          throw new Error(
+            data.error || "Aspirasi gagal dikirim. Silakan coba lagi."
+          );
+        }
+
+        showResult(
+          submitResult,
+          "Aspirasi berhasil dikirim! Kode pelacakan: " +
+            data.tracking_code +
+            ". Simpan kode ini untuk digunakan nanti. Status: " +
+            (data.status || "Masuk") + ".",
+          true
+        );
+
+        form.reset();
+        charCount.textContent = "0";
+      } catch (error) {
+        showResult(
+          submitResult,
+          error.message ||
+            "Koneksi gagal. Periksa internet dan coba kembali.",
+          false
+        );
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Kirim Aspirasi";
+      }
+    });
+
+    document.getElementById("trackingForm").addEventListener(
+      "submit",
+      (event) => {
+        event.preventDefault();
+        showResult(
+          document.getElementById("trackingResult"),
+          "Fitur pelacakan belum aktif. Silakan coba lagi setelah sistem pelacakan tersedia.",
+          false
+        );
+      }
+    );
+  </script>
 </body>
-</html>
+    </html>
+        
